@@ -1,0 +1,32 @@
+32,24
+# legenda:
+# *: personagem
+# @: tesouro
+# p: parede
+
+-
+*
+
+
+
+
+
+
+
+
+
+
+
+@
+
+
+@          ppppppppppppppppppp  
+           p                 
+           p       @ @       p
+           p       @ @       p
+           p                 p
+           p                 p            
+           ppppppppppppppppppp
+
+
+                     @
