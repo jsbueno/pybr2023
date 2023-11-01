@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61", "wheel>=0.34.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.build]
+backend = "setuptools"
+
+[tool.setuptools.packages.find]
+include = ["artlogic"]
+
+[project]
+name = "jogomapa"
+description = "Jogo de Mapas - com OOP, tutorial da Pythonbrasil 2023"
+version = "0.1.0"
+authors = [
+  { name = "Joao Bueno", email = "jsobueno@gmail.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.9"
+dependencies = ["pygame"]
+
+
+[project.scripts]
+jogomapa = "jogomapa:inicio"
