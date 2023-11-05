@@ -5,7 +5,11 @@ import weakref
 import pygame
 from pygame import Vector2 as V2
 
-from jogomapa.game_exceptions import GameDefeatException, GameWinException
+from jogomapa.game_exceptions import (
+    GameDefeatException,
+    GameWinException,
+    GameClosedException
+)
 
 resolucao = V2(800, 600)
 grade = V2(32, 24)
@@ -192,12 +196,12 @@ class Mapa:
 
 
 class Jogo:
-    def __init__(self):
+    def __init__(self, mapa, pontuacao=None):
         pygame.init()
         self.posicoes = weakref.WeakValueDictionary()
 
         self.frame_atual = 0
-        self.pontuacao = 0
+        self.pontuacao = pontuacao if pontuacao else 0
         self.tela = pygame.display.set_mode(resolucao)
         self.fonte = pygame.font.SysFont("Arial", int(altura))
 
@@ -206,7 +210,7 @@ class Jogo:
         self.total_bombas = 0
         self.deslocamento = V2(0, 0)
 
-        self.ler_mapa("mapa_1.txt")
+        self.ler_mapa(f"mapas/{mapa}")
 
     def __getitem__(self, pos):
         return self.posicoes.get((pos[0], pos[1]))
@@ -225,7 +229,7 @@ class Jogo:
             self.tela.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    return
+                    raise GameClosedException
 
             keys = pygame.key.get_pressed()
             self.p1.mover(keys)
@@ -248,7 +252,7 @@ class Jogo:
             pygame.time.delay(30)
 
     def mostrar_pontuacao(self):
-        texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255,255))
+        texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
         x = 0
         y = resolucao.y - altura
         self.tela.blit(texto, (x, y))

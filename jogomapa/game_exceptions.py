@@ -12,5 +12,11 @@ class GameWinException(GameException):
 
 class GameDefeatException(GameException):
     """
-    Raises when the game finishes by defeat condition
+    Raises when the game finishes by defeat condition.
+    """
+
+
+class GameClosedException(GameException):
+    """
+    Raises when the game is closed.
     """
