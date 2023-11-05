@@ -15,14 +15,14 @@ class MyVector(pygame.Vector2):
     def __init__(self, *args, owner=None):
         super().__init__(*args)
         self.jogo = owner
-        self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
+        self.jogo.jogo.positions[self.x, self.y] = self.jogo
 
     def __iadd__(self, other):
         if self.check(other):
             prev = self.x, self.y
             super().__iadd__(other)
-            del self.jogo.jogo.posicoes[prev]
-            self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
+            del self.jogo.jogo.positions[prev]
+            self.jogo.jogo.positions[self.x, self.y] = self.jogo
         return self
 
     def __isub__(self, other):
@@ -30,8 +30,8 @@ class MyVector(pygame.Vector2):
         if self.check(-other):
             prev = self.x, self.y
             super().__isub__(other)
-            del self.jogo.jogo.posicoes[prev]
-            self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
+            del self.jogo.jogo.positions[prev]
+            self.jogo.jogo.positions[self.x, self.y] = self.jogo
         return self
 
     def check(self, other):
@@ -61,7 +61,7 @@ class Pegavel(Objeto):
     pontos = 0
 
     def pegou(self):
-        self.jogo.pontuacao += self.pontos
+        self.jogo.score += self.pontos
         self.kill()
 
 
@@ -71,7 +71,7 @@ class Tesouro(Pegavel):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.jogo.tesouros.add(self)
+        self.jogo.treasures.add(self)
 
 
 class Parede(Objeto):
@@ -87,7 +87,7 @@ class Bomba(Pegavel):
         self.jogo.p1.vidas -= 1
         if self.jogo.p1.vidas == 0:
             raise GameDefeatException
-        self.jogo.total_bombas += 1
+        self.jogo.bombs += 1
 
 class Doce(Pegavel):
     cor = (148, 0, 211)
@@ -104,13 +104,13 @@ class Personagem(Objeto):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.ultima_atualizacao = self.jogo.frame_atual
+        self.ultima_atualizacao = self.jogo.current_frame
         self.jogo.p1 = self
 
     def mover(self, keys):
-        if self.jogo.frame_atual - self.ultima_atualizacao < self.atraso:
+        if self.jogo.current_frame - self.ultima_atualizacao < self.atraso:
             return
-        self.ultima_atualizacao = self.jogo.frame_atual
+        self.ultima_atualizacao = self.jogo.current_frame
         if keys[pygame.K_DOWN]:
             self.pos += (0, 1)
         if keys[pygame.K_UP]:
@@ -201,27 +201,26 @@ class Mapa:
         return "\n".join(linhas)
 
 
-class Jogo:
-    def __init__(self, mapa, pontuacao=None, vidas=3):
+class Game:
+    def __init__(self, maps, score=None, lives=3):
         pygame.init()
-        self.posicoes = weakref.WeakValueDictionary()
+        self.positions = weakref.WeakValueDictionary()
 
-        self.frame_atual = 0
-        self.pontuacao = pontuacao if pontuacao else 0
-        self.tela = pygame.display.set_mode(RESOLUTION)
-        self.fonte = pygame.font.SysFont("Arial", int(HEIGTH))
+        self.current_frame = 0
+        self.score = score if score else 0
+        self.screen = pygame.display.set_mode(RESOLUTION)
+        self.font = pygame.font.SysFont("Arial", int(HEIGTH))
 
-        self.objetos = pygame.sprite.Group()
-        self.tesouros = pygame.sprite.Group()
-        self.total_bombas = 0
-        self.deslocamento = V2(0, 0)
+        self.objects = pygame.sprite.Group()
+        self.treasures = pygame.sprite.Group()
+        self.bombs = 0
 
-        self.ler_mapa(f"mapas/{mapa}", vidas)
+        self.load_maps(f"maps/{maps}", lives)
 
     def __getitem__(self, pos):
-        return self.posicoes.get((pos[0], pos[1]))
+        return self.positions.get((pos[0], pos[1]))
 
-    def ler_mapa(self, arq_mapa, vidas):
+    def load_maps(self, arq_mapa, vidas):
         caminho = Path(__file__).parent
         mapa = Mapa(caminho / arq_mapa)
         for pos, character in mapa:
@@ -230,11 +229,11 @@ class Jogo:
             item = tabela[character](self, pos)
             if isinstance(item, Personagem):
                 item.set_vidas(vidas)
-            self.objetos.add(item)
+            self.objects.add(item)
 
-    def executar(self):
+    def run(self):
         while True:
-            self.tela.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     raise GameClosedException
@@ -242,81 +241,65 @@ class Jogo:
             keys = pygame.key.get_pressed()
             self.p1.mover(keys)
 
-            if not any(self.tesouros):
+            if not any(self.treasures):
                 raise GameWinException
 
             if keys[pygame.K_p]:
-                print(dict(self.posicoes))
+                print(dict(self.positions))
 
-            for objeto in self.objetos:
+            for objeto in self.objects:
                 pygame.draw.rect(
-                    self.tela,
+                    self.screen,
                     objeto.cor,
                     (*objeto.coord_tela, WIDTH, HEIGTH)
                 )
 
-            self.mostrar_pontuacao()
-            self.mostrar_vidas()
+            self.show_score()
+            self.show_lives()
             pygame.display.update()
-            self.frame_atual += 1
+            self.current_frame += 1
             pygame.time.delay(30)
 
-    def mostrar_pontuacao(self):
-        texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
+    def show_score(self):
+        text = self.font.render(f"{self.score}", True, (255, 255, 255))
         x = 0
         y = RESOLUTION.y - HEIGTH
-        self.tela.blit(texto, (x, y))
+        self.screen.blit(text, (x, y))
 
-    def mostrar_vidas(self):
-        texto = self.fonte.render(f"{self.p1.vidas}", True, (255, 0, 0))
-        self.tela.blit(texto, (RESOLUTION.x / 3, RESOLUTION.y - HEIGTH))
+    def show_lives(self):
+        texto = self.font.render(f"{self.p1.vidas}", True, (255, 0, 0))
+        self.screen.blit(texto, (RESOLUTION.x / 3, RESOLUTION.y - HEIGTH))
 
-    def mostrar_vitoria(self):
+    def win_screen(self):
         while True:
-            self.tela.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
                 if event.type == pygame.KEYDOWN:
                     return
 
-            texto = self.fonte.render("PRÓXIMA FASE", True, (255, 255, 255))
-            self.tela.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
+            texto = self.font.render("PRÓXIMA FASE", True, (255, 255, 255))
+            self.screen.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
 
             pygame.display.update()
-            self.frame_atual += 1
+            self.current_frame += 1
             pygame.time.delay(30)
 
-    def fim_jogo(self):
+    def game_over(self):
         while True:
-            self.tela.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
                 if event.type == pygame.KEYDOWN:
                     return
 
-            texto = self.fonte.render(
-                f"{self.pontuacao}", True, (255, 255, 255)
+            texto = self.font.render(
+                f"{self.score}", True, (255, 255, 255)
             )
-            self.tela.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
+            self.screen.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
 
             pygame.display.update()
-            self.frame_atual += 1
+            self.current_frame += 1
             pygame.time.delay(30)
-
-
-def inicio():
-    try:
-        jogo = Jogo()
-        jogo.executar()
-    finally:
-        pygame.quit()
-
-
-if __name__ == "__main__":
-    try:
-        jogo = Jogo()
-        jogo.executar()
-    finally:
-        pygame.quit()

@@ -2,28 +2,30 @@ import os
 
 import pygame
 
-import jogomapa
+from jogomapa import Game
 from jogomapa.game_exceptions import (
     GameWinException,
     GameDefeatException,
     GameClosedException,
 )
 
-diretorio_mapas = os.path.join(os.path.dirname(__file__), "mapas")
-mapas = os.listdir(diretorio_mapas)
-pontuacao = 0
-vidas = 3
+maps_path = os.path.join(os.path.dirname(__file__), "maps")
+maps = os.listdir(maps_path)
+game_data = {
+    "score": 0,
+    "lives": 3
+}
 
 while True:
     try:
-        jogo = jogomapa.Jogo(pontuacao=pontuacao, mapa=mapas.pop(0), vidas=vidas)
-        jogo.executar()
+        game = Game(maps=maps.pop(0), **game_data)
+        game.run()
     except GameWinException:
-        jogo.mostrar_vitoria()
-        pontuacao = jogo.pontuacao
-        vidas = jogo.p1.vidas
+        game.win_screen()
+        game_data["score"] = game.score
+        game_data["lives"] = game.p1.vidas
     except GameDefeatException:
-        jogo.fim_jogo()
+        game.game_over()
         pygame.quit()
         break
     except (IndexError, GameClosedException):
