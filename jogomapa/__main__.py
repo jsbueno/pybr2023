@@ -1,10 +1,7 @@
 import pygame
 
 import jogomapa
-from jogomapa.game_exceptions import (
-    GameWinException,
-    GameDefeatException
-)
+from jogomapa.game_exceptions import GameWinException, GameDefeatException
 
 try:
     jogo = jogomapa.Jogo()
