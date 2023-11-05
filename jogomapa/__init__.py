@@ -242,15 +242,24 @@ class Jogo:
                 )
 
             self.mostrar_pontuacao()
+            self.mostrar_vidas()
             pygame.display.update()
             self.frame_atual += 1
             pygame.time.delay(30)
 
     def mostrar_pontuacao(self):
+<<<<<<< HEAD
         texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
+=======
+        texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255,255))
+>>>>>>> 2278fa1 (Life counter)
         x = 0
         y = resolucao.y - altura
         self.tela.blit(texto, (x, y))
+
+    def mostrar_vidas(self):
+        texto = self.fonte.render(f"{self.p1.vidas}", True, (255, 0, 0))
+        self.tela.blit(texto, (resolucao.x/3, resolucao.y - altura))
 
     def mostrar_vitoria(self):
         while True:
