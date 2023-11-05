@@ -250,6 +250,26 @@ class Jogo:
                     return
 
             texto = self.fonte.render(
+                "PRÓXIMA FASE",
+                True,
+                (255, 255, 255)
+            )
+            self.tela.blit(texto, (resolucao.x/2, resolucao.y/2))
+
+            pygame.display.update()
+            self.frame_atual += 1
+            pygame.time.delay(30)
+
+    def fim_jogo(self):
+        while True:
+            self.tela.fill((0, 0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                if event.type == pygame.KEYDOWN:
+                    return
+
+            texto = self.fonte.render(
                 f"{self.pontuacao}",
                 True,
                 (255, 255, 255)
