@@ -95,6 +95,12 @@ class Bomba(Pegavel):
             raise GameDefeatException
         self.dono.total_bombas += 1
 
+class Doce(Pegavel):
+    cor = (148, 0, 211)
+
+    def pegou(self):
+        super().pegou()
+        self.dono.p1.vidas += 1
 
 class Personagem(Objeto):
     atraso = 3
@@ -144,6 +150,7 @@ tabela = {
     "*": Personagem,
     "p": Parede,
     "b": Bomba,
+    "d": Doce,
 }
 
 

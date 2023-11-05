@@ -4,6 +4,7 @@
 # @: tesouro
 # p: parede
 # b: bomba
+# d: doce
 -
 *
 
@@ -14,13 +15,13 @@ pppppppppppppppppppppppppppppb
 
 @ bbpppppppppppppppppppppppppppp
 
-ppppppbppppppppp @ pppbppppppppp
+pppppdbppppppppp @ pppbppppppppp
 
 
 @@                           @@
 
-
-             @@
+                    bdb
+             @@      b
 
         pppppppppppppp
         p            p
