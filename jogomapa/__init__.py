@@ -3,19 +3,13 @@ import weakref
 
 import pygame
 from pygame import Vector2 as V2
+from jogomapa.contants import HEIGTH, RESOLUTION, WIDTH, GRID
 
 from jogomapa.game_exceptions import (
     GameDefeatException,
     GameWinException,
     GameClosedException,
 )
-
-resolucao = V2(800, 600)
-grade = V2(32, 24)
-
-escala = resolucao.x // grade.x
-largura, altura = resolucao.x // grade.x, resolucao.y // grade.y
-
 
 class MyVector(pygame.Vector2):
     def __init__(self, *args, owner=None):
@@ -56,10 +50,10 @@ class Objeto(pygame.sprite.Sprite):
 
     @property
     def coord_tela(self):
-        return V2(self.pos.x * altura, self.pos.y * largura)
+        return V2(self.pos.x * HEIGTH, self.pos.y * WIDTH)
 
     def check(self, coord):
-        result = 0 <= coord.x < grade.x and 0 <= coord.y < grade.y
+        result = 0 <= coord.x < GRID.x and 0 <= coord.y < GRID.y
         return result
 
 
@@ -163,10 +157,10 @@ class Mapa:
         self.le_dados(dados)
 
     def le_cabecalho(self, dados):
-        linha_altura_larg = dados[0]
-        larg_txt, alt_txt = linha_altura_larg.split(",")
-        self.altura = int(alt_txt.strip())
-        self.largura = int(larg_txt.strip())
+        linha_HEIGTH_larg = dados[0]
+        larg_txt, alt_txt = linha_HEIGTH_larg.split(",")
+        self.HEIGTH = int(alt_txt.strip())
+        self.WIDTH = int(larg_txt.strip())
 
     def le_dados(self, dados):
         for i, linha in enumerate(dados):
@@ -184,7 +178,7 @@ class Mapa:
         indice = V2(indice)
         x = int(indice[0])
         y = int(indice[1])
-        if not (0 <= x < self.largura and 0 <= y < self.altura):
+        if not (0 <= x < self.WIDTH and 0 <= y < self.HEIGTH):
             raise IndexError()
         if y >= len(self.dados):
             return " "
@@ -193,15 +187,15 @@ class Mapa:
         return self.dados[y][x]
 
     def __iter__(self):
-        for linha in range(self.altura):
-            for col in range(self.largura):
+        for linha in range(self.HEIGTH):
+            for col in range(self.WIDTH):
                 yield V2(col, linha), self[col, linha]
 
     def __repr__(self):
         linhas = []
-        for linha in range(self.altura):
+        for linha in range(self.HEIGTH):
             linha_tmp = ""
-            for col in range(self.largura):
+            for col in range(self.WIDTH):
                 linha_tmp += self[col, linha]
             linhas.append(linha_tmp)
         return "\n".join(linhas)
@@ -214,8 +208,8 @@ class Jogo:
 
         self.frame_atual = 0
         self.pontuacao = pontuacao if pontuacao else 0
-        self.tela = pygame.display.set_mode(resolucao)
-        self.fonte = pygame.font.SysFont("Arial", int(altura))
+        self.tela = pygame.display.set_mode(RESOLUTION)
+        self.fonte = pygame.font.SysFont("Arial", int(HEIGTH))
 
         self.objetos = pygame.sprite.Group()
         self.tesouros = pygame.sprite.Group()
@@ -258,7 +252,7 @@ class Jogo:
                 pygame.draw.rect(
                     self.tela,
                     objeto.cor,
-                    (*objeto.coord_tela, largura, altura)
+                    (*objeto.coord_tela, WIDTH, HEIGTH)
                 )
 
             self.mostrar_pontuacao()
@@ -270,12 +264,12 @@ class Jogo:
     def mostrar_pontuacao(self):
         texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
         x = 0
-        y = resolucao.y - altura
+        y = RESOLUTION.y - HEIGTH
         self.tela.blit(texto, (x, y))
 
     def mostrar_vidas(self):
         texto = self.fonte.render(f"{self.p1.vidas}", True, (255, 0, 0))
-        self.tela.blit(texto, (resolucao.x / 3, resolucao.y - altura))
+        self.tela.blit(texto, (RESOLUTION.x / 3, RESOLUTION.y - HEIGTH))
 
     def mostrar_vitoria(self):
         while True:
@@ -287,7 +281,7 @@ class Jogo:
                     return
 
             texto = self.fonte.render("PRÓXIMA FASE", True, (255, 255, 255))
-            self.tela.blit(texto, (resolucao.x / 2, resolucao.y / 2))
+            self.tela.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
 
             pygame.display.update()
             self.frame_atual += 1
@@ -305,7 +299,7 @@ class Jogo:
             texto = self.fonte.render(
                 f"{self.pontuacao}", True, (255, 255, 255)
             )
-            self.tela.blit(texto, (resolucao.x / 2, resolucao.y / 2))
+            self.tela.blit(texto, (RESOLUTION.x / 2, RESOLUTION.y / 2))
 
             pygame.display.update()
             self.frame_atual += 1
