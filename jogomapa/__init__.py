@@ -5,7 +5,7 @@ import weakref
 import pygame
 from pygame import Vector2 as V2
 
-from jogomapa.game_exceptions import GameWinException
+from jogomapa.game_exceptions import GameDefeatException, GameWinException
 
 resolucao = V2(800, 600)
 grade = V2(32, 24)
@@ -80,11 +80,15 @@ class Bomba(Pegavel):
 
     def pegou(self):
         super().pegou()
+        self.dono.p1.vidas -=1
+        if self.dono.p1.vidas == 0:
+            raise GameDefeatException
         self.dono.total_bombas += 1
 
 
 class Personagem(Objeto):
     atraso = 3
+    vidas = 3
     cor = (255, 0, 0)
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
