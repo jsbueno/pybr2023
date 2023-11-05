@@ -145,7 +145,7 @@ tabela = {
     "*": Personagem,
     "p": Parede,
     "b": Bomb,
-    "d": Candy,
+    "c": Candy,
 }
 
 
