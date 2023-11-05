@@ -16,6 +16,7 @@ class MyVector(pygame.Vector2):
         super().__init__(*args)
         self.dono = owner
         self.dono.dono.posicoes[self.x, self.y] = self.dono
+
     def __iadd__(self, other):
         if self.check(other):
             prev = self.x, self.y
@@ -23,6 +24,7 @@ class MyVector(pygame.Vector2):
             del self.dono.dono.posicoes[prev]
             self.dono.dono.posicoes[self.x, self.y] = self.dono
         return self
+    
     def __isub__(self, other):
         other = V2(other)
         if self.check(-other):
@@ -31,6 +33,7 @@ class MyVector(pygame.Vector2):
             del self.dono.dono.posicoes[prev]
             self.dono.dono.posicoes[self.x, self.y] = self.dono
         return self
+    
     def check(self, other):
         if self.dono is None:
             return True
@@ -38,6 +41,7 @@ class MyVector(pygame.Vector2):
 
 class Objeto(pygame.sprite.Sprite):
     cor = (128, 128, 128)
+
     def __init__(self, dono, pos):
         super().__init__()
         self.dono = dono
@@ -46,18 +50,35 @@ class Objeto(pygame.sprite.Sprite):
     @property
     def coord_tela(self):
         return V2(self.pos.x * altura, self.pos.y * largura)
+    
     def check(self, coord):
         result = 0 <= coord.x < grade.x and 0 <= coord.y < grade.y
         return result 
-    
-class Tesouro(Objeto):
+
+class Pegavel(Objeto):
+    pontos = 0
+    def pegou(self):
+        self.dono.pontuacao += self.pontos
+        self.kill()
+
+class Tesouro(Pegavel):
     cor = (0, 0, 255)
+    pontos = 10
+
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.dono.tesouros.add(self)
 
 class Parede(Objeto):
     cor = (255, 255, 255)
+
+class Bomba(Pegavel):
+    cor = (255, 255, 0)
+    pontos = -10
+
+    def pegou(self):
+        super().pegou()
+        self.dono.total_bombas += 1
 
 
 class Personagem(Objeto):
@@ -89,8 +110,8 @@ class Personagem(Objeto):
             if objeto_aqui and not isinstance(objeto_aqui, Personagem):
                 # Lugar ideal pra usar o
                 # comando match/case (py 3.10)
-                if isinstance(objeto_aqui, Tesouro):
-                    self.dono.pegou_tesouro(objeto_aqui)
+                if isinstance(objeto_aqui, Pegavel):
+                    objeto_aqui.pegou()
                 elif isinstance(objeto_aqui, Parede):
                     result = False
 
@@ -101,6 +122,7 @@ tabela = {
 "@": Tesouro,
 "*": Personagem,
 "p": Parede,
+"b": Bomba,
 }
 
 class Mapa:
@@ -164,6 +186,7 @@ class Jogo:
 
         self.objetos = pygame.sprite.Group()
         self.tesouros = pygame.sprite.Group()
+        self.total_bombas = 0
 
         self.ler_mapa("mapa_0.txt")
 
@@ -200,14 +223,6 @@ class Jogo:
             self.frame_atual += 1
             pygame.time.delay(30)
     
-    def pegou_tesouro(self, tesouro):
-        self.pontuar()
-        tesouro.kill()
-    def pontuar(self):
-        self.pontuacao += 10
-        # self.criar_alvo()
-
-
 
     def mostrar_pontuacao(self):
         texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255,255) )

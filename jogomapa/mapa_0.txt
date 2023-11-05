@@ -3,7 +3,7 @@
 # *: personagem
 # @: tesouro
 # p: parede
-
+# b: bomba
 -
 *
 
@@ -12,21 +12,21 @@
 
 
 
-
-
-
+          pppbb         bbbb
+  bppppp  @@@@@@ppppp@@@@@
+            pppp
 
 
 @
+bpppppppppppppppb
 
-
-@          ppppppppppppppppppp  
+@          ppppppppppppppppppb 
            p                 
-           p       @ @       p
+           p       @ @       b
            p       @ @       p
            p                 p
            p                 p            
            ppppppppppppppppppp
 
 
-                     @
+                     @ bbbbbb

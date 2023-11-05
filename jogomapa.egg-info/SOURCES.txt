@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+jogomapa.egg-info/PKG-INFO
+jogomapa.egg-info/SOURCES.txt
+jogomapa.egg-info/dependency_links.txt
+jogomapa.egg-info/entry_points.txt
+jogomapa.egg-info/requires.txt
+jogomapa.egg-info/top_level.txt
