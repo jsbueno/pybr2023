@@ -5,6 +5,8 @@ import weakref
 import pygame
 from pygame import Vector2 as V2
 
+from jogomapa.game_exceptions import GameWinException
+
 resolucao = V2(800, 600)
 grade = V2(32, 24)
 
@@ -212,6 +214,10 @@ class Jogo:
 
             keys = pygame.key.get_pressed()
             self.p1.mover(keys)
+
+            if not any(self.tesouros):
+                raise GameWinException
+
             if keys[pygame.K_p]:
                 print (dict(self.posicoes))
 
@@ -229,6 +235,27 @@ class Jogo:
         x = 0
         y = resolucao.y - altura
         self.tela.blit(texto, (x,y))
+
+    def mostrar_vitoria(self):
+        while True:
+            self.tela.fill((0, 0, 0))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    return
+                if event.type == pygame.KEYDOWN:
+                    return
+
+            texto = self.fonte.render(
+                f"{self.pontuacao}",
+                True,
+                (255, 255, 255)
+            )
+            self.tela.blit(texto, (resolucao.x/2, resolucao.y/2))
+
+            pygame.display.update()
+            self.frame_atual += 1
+            pygame.time.delay(30)
+
 
 def inicio():
     try:
