@@ -20,15 +20,15 @@ largura, altura = resolucao.x // grade.x, resolucao.y // grade.y
 class MyVector(pygame.Vector2):
     def __init__(self, *args, owner=None):
         super().__init__(*args)
-        self.dono = owner
-        self.dono.dono.posicoes[self.x, self.y] = self.dono
+        self.jogo = owner
+        self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
 
     def __iadd__(self, other):
         if self.check(other):
             prev = self.x, self.y
             super().__iadd__(other)
-            del self.dono.dono.posicoes[prev]
-            self.dono.dono.posicoes[self.x, self.y] = self.dono
+            del self.jogo.jogo.posicoes[prev]
+            self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
         return self
 
     def __isub__(self, other):
@@ -36,14 +36,14 @@ class MyVector(pygame.Vector2):
         if self.check(-other):
             prev = self.x, self.y
             super().__isub__(other)
-            del self.dono.dono.posicoes[prev]
-            self.dono.dono.posicoes[self.x, self.y] = self.dono
+            del self.jogo.jogo.posicoes[prev]
+            self.jogo.jogo.posicoes[self.x, self.y] = self.jogo
         return self
 
     def check(self, other):
-        if self.dono is None:
+        if self.jogo is None:
             return True
-        return self.dono.check(V2(self) + V2(other))
+        return self.jogo.check(V2(self) + V2(other))
 
 
 class Objeto(pygame.sprite.Sprite):
@@ -51,7 +51,7 @@ class Objeto(pygame.sprite.Sprite):
 
     def __init__(self, dono, pos):
         super().__init__()
-        self.dono = dono
+        self.jogo = dono
         self.pos = MyVector(pos, owner=self)
 
     @property
@@ -67,7 +67,7 @@ class Pegavel(Objeto):
     pontos = 0
 
     def pegou(self):
-        self.dono.pontuacao += self.pontos
+        self.jogo.pontuacao += self.pontos
         self.kill()
 
 
@@ -77,7 +77,7 @@ class Tesouro(Pegavel):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.dono.tesouros.add(self)
+        self.jogo.tesouros.add(self)
 
 
 class Parede(Objeto):
@@ -90,18 +90,18 @@ class Bomba(Pegavel):
 
     def pegou(self):
         super().pegou()
-        self.dono.p1.vidas -= 1
-        if self.dono.p1.vidas == 0:
+        self.jogo.p1.vidas -= 1
+        if self.jogo.p1.vidas == 0:
             raise GameDefeatException
-        self.dono.total_bombas += 1
+        self.jogo.total_bombas += 1
 
 class Doce(Pegavel):
     cor = (148, 0, 211)
 
     def pegou(self):
         super().pegou()
-        if self.dono.p1.vidas < 3:
-            self.dono.p1.vidas += 1
+        if self.jogo.p1.vidas < 3:
+            self.jogo.p1.vidas += 1
 
 class Personagem(Objeto):
     atraso = 3
@@ -110,13 +110,13 @@ class Personagem(Objeto):
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.ultima_atualizacao = self.dono.frame_atual
-        self.dono.p1 = self
+        self.ultima_atualizacao = self.jogo.frame_atual
+        self.jogo.p1 = self
 
     def mover(self, keys):
-        if self.dono.frame_atual - self.ultima_atualizacao < self.atraso:
+        if self.jogo.frame_atual - self.ultima_atualizacao < self.atraso:
             return
-        self.ultima_atualizacao = self.dono.frame_atual
+        self.ultima_atualizacao = self.jogo.frame_atual
         if keys[pygame.K_DOWN]:
             self.pos += (0, 1)
         if keys[pygame.K_UP]:
@@ -129,7 +129,7 @@ class Personagem(Objeto):
     def check(self, pos):
         result = super().check(pos)
         if result:
-            objeto_aqui = self.dono[pos]
+            objeto_aqui = self.jogo[pos]
 
             if objeto_aqui and not isinstance(objeto_aqui, Personagem):
                 # Lugar ideal pra usar o
