@@ -1,5 +1,4 @@
 from pathlib import Path
-import random
 import weakref
 
 import pygame
@@ -8,7 +7,7 @@ from pygame import Vector2 as V2
 from jogomapa.game_exceptions import (
     GameDefeatException,
     GameWinException,
-    GameClosedException
+    GameClosedException,
 )
 
 resolucao = V2(800, 600)
@@ -141,6 +140,10 @@ class Personagem(Objeto):
 
         return result
 
+    def set_vidas(self, vidas):
+        if vidas > 0 and vidas <= 3:
+            self.vidas = vidas
+
 
 tabela = {
     "@": Tesouro,
@@ -171,7 +174,8 @@ class Mapa:
                 break
         else:
             raise ValueError(
-                "O arquivo de mapa deve conter uma linah com um unico '-' indicando o inicio dos dados"
+                "O arquivo de mapa deve conter uma linha com um \
+                    unico '-' indicando o inicio dos dados"
             )
         self.dados = [linha.rstrip("\n") for linha in dados[i:]]
 
@@ -203,7 +207,7 @@ class Mapa:
 
 
 class Jogo:
-    def __init__(self, mapa, pontuacao=None):
+    def __init__(self, mapa, pontuacao=None, vidas=3):
         pygame.init()
         self.posicoes = weakref.WeakValueDictionary()
 
@@ -217,18 +221,20 @@ class Jogo:
         self.total_bombas = 0
         self.deslocamento = V2(0, 0)
 
-        self.ler_mapa(f"mapas/{mapa}")
+        self.ler_mapa(f"mapas/{mapa}", vidas)
 
     def __getitem__(self, pos):
         return self.posicoes.get((pos[0], pos[1]))
 
-    def ler_mapa(self, arq_mapa):
+    def ler_mapa(self, arq_mapa, vidas):
         caminho = Path(__file__).parent
         mapa = Mapa(caminho / arq_mapa)
         for pos, character in mapa:
             if character == " ":
                 continue
             item = tabela[character](self, pos)
+            if isinstance(item, Personagem):
+                item.set_vidas(vidas)
             self.objetos.add(item)
 
     def executar(self):
@@ -249,7 +255,9 @@ class Jogo:
 
             for objeto in self.objetos:
                 pygame.draw.rect(
-                    self.tela, objeto.cor, (*objeto.coord_tela, largura, altura)
+                    self.tela,
+                    objeto.cor,
+                    (*objeto.coord_tela, largura, altura)
                 )
 
             self.mostrar_pontuacao()
@@ -266,7 +274,7 @@ class Jogo:
 
     def mostrar_vidas(self):
         texto = self.fonte.render(f"{self.p1.vidas}", True, (255, 0, 0))
-        self.tela.blit(texto, (resolucao.x/3, resolucao.y - altura))
+        self.tela.blit(texto, (resolucao.x / 3, resolucao.y - altura))
 
     def mostrar_vitoria(self):
         while True:
@@ -293,7 +301,9 @@ class Jogo:
                 if event.type == pygame.KEYDOWN:
                     return
 
-            texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
+            texto = self.fonte.render(
+                f"{self.pontuacao}", True, (255, 255, 255)
+            )
             self.tela.blit(texto, (resolucao.x / 2, resolucao.y / 2))
 
             pygame.display.update()
