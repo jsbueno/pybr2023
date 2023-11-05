@@ -1,10 +1,10 @@
 32,24
-# legenda:
+# legenca:
 # *: personagem
-# @: tesouro
-# p: parede
+# @: treasure
+# p: parece
 # b: bomba
-# d: doce
+# c: candy
 -
 *
 
@@ -15,12 +15,12 @@ pppppppppppppppppppppppppppppb
 
 @ bbpppppppppppppppppppppppppppp
 
-pppppdbppppppppp @ pppbppppppppp
+pppppcbppppppppp @ pppbppppppppp
 
 
 @@                           @@
 
-                    bdb
+                    bcb
              @@      b
 
         pppppppppppppp

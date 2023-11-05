@@ -63,7 +63,7 @@ class Objeto(pygame.sprite.Sprite):
         return result
 
 
-class Pegavel(Objeto):
+class Catch(Objeto):
     pontos = 0
 
     def pegou(self):
@@ -71,20 +71,20 @@ class Pegavel(Objeto):
         self.kill()
 
 
-class Tesouro(Pegavel):
+class Treasure(Catch):
     cor = (0, 0, 255)
     pontos = 10
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
-        self.jogo.tesouros.add(self)
+        self.jogo.treasures.add(self)
 
 
 class Parede(Objeto):
     cor = (255, 255, 255)
 
 
-class Bomba(Pegavel):
+class Bomb(Catch):
     cor = (255, 255, 0)
     pontos = -10
 
@@ -95,7 +95,7 @@ class Bomba(Pegavel):
             raise GameDefeatException
         self.jogo.total_bombas += 1
 
-class Doce(Pegavel):
+class Candy(Catch):
     cor = (148, 0, 211)
 
     def pegou(self):
@@ -134,7 +134,7 @@ class Personagem(Objeto):
             if objeto_aqui and not isinstance(objeto_aqui, Personagem):
                 # Lugar ideal pra usar o
                 # comando match/case (py 3.10)
-                if isinstance(objeto_aqui, Pegavel):
+                if isinstance(objeto_aqui, Catch):
                     objeto_aqui.pegou()
                 elif isinstance(objeto_aqui, Parede):
                     result = False
@@ -147,11 +147,11 @@ class Personagem(Objeto):
 
 
 tabela = {
-    "@": Tesouro,
+    "@": Treasure,
     "*": Personagem,
     "p": Parede,
-    "b": Bomba,
-    "d": Doce,
+    "b": Bomb,
+    "d": Candy,
 }
 
 
@@ -218,7 +218,7 @@ class Jogo:
         self.fonte = pygame.font.SysFont("Arial", int(altura))
 
         self.objetos = pygame.sprite.Group()
-        self.tesouros = pygame.sprite.Group()
+        self.treasures = pygame.sprite.Group()
         self.total_bombas = 0
         self.deslocamento = V2(0, 0)
 
@@ -248,7 +248,7 @@ class Jogo:
             keys = pygame.key.get_pressed()
             self.p1.mover(keys)
 
-            if not any(self.tesouros):
+            if not any(self.treasures):
                 raise GameWinException
 
             if keys[pygame.K_p]:
