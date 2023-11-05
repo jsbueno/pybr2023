@@ -1,0 +1,7 @@
+from pygame import Vector2 as V2
+
+RESOLUTION = V2(800, 600)
+GRID = V2(32, 24)
+
+SCALE = RESOLUTION.x // GRID.x
+WIDTH, HEIGTH = RESOLUTION.x // GRID.x, RESOLUTION.y // GRID.y
