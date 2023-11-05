@@ -100,7 +100,8 @@ class Doce(Pegavel):
 
     def pegou(self):
         super().pegou()
-        self.dono.p1.vidas += 1
+        if self.dono.p1.vidas < 3:
+            self.dono.p1.vidas += 1
 
 class Personagem(Objeto):
     atraso = 3
