@@ -50,7 +50,11 @@ class Objeto(pygame.sprite.Sprite):
 
     @property
     def coord_tela(self):
-        return V2(self.pos.x * HEIGTH, self.pos.y * WIDTH)
+        return V2(
+            (self.pos.x - self.jogo.offsets.x) * HEIGTH,
+            (self.pos.y - self.jogo.offsets.y) * WIDTH,
+        )
+
 
     def check(self, coord):
         result = 0 <= coord.x < GRID.x and 0 <= coord.y < GRID.y
@@ -230,6 +234,7 @@ class Game:
             if isinstance(item, Personagem):
                 item.set_vidas(vidas)
             self.objects.add(item)
+        self.offsets = V2(0,0)  # WIP
 
     def run(self):
         while True:
@@ -247,12 +252,8 @@ class Game:
             if keys[pygame.K_p]:
                 print(dict(self.positions))
 
-            for objeto in self.objects:
-                pygame.draw.rect(
-                    self.screen,
-                    objeto.cor,
-                    (*objeto.coord_tela, WIDTH, HEIGTH)
-                )
+            self.renderizar()
+
 
             self.show_score()
             self.show_lives()
@@ -262,6 +263,15 @@ class Game:
 
     def show_score(self):
         text = self.font.render(f"{self.score}", True, (255, 255, 255))
+
+    def renderizar(self):
+        for objeto in self.objects:
+            pygame.draw.rect(
+                self.screen, objeto.cor, (*objeto.coord_tela, WIDTH, HEIGTH)
+            )
+
+    def mostrar_pontuacao(self):
+        texto = self.fonte.render(f"{self.pontuacao}", True, (255, 255, 255))
         x = 0
         y = RESOLUTION.y - HEIGTH
         self.screen.blit(text, (x, y))
