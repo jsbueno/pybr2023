@@ -1,21 +1,21 @@
 32,24
-# legenca:
-# *: personagem
+# legenda:
+# *: wersonagem
 # @: treasure
-# p: parece
-# b: bomba
+# w: wall
+# b: bomb
 # c: candy
 -
 *
 
 
-pppppppppppppppppppppppppppppb
+wwwwwwwwwwwwwwwwwwwwwwwwwwwwwb
 
 @
 
-@ bbpppppppppppppppppppppppppppp
+@ bbwwwwwwwwwwwwwwwwwwwwwwwwwwww
 
-pppppcbppppppppp @ pppbppppppppp
+wwwwwcbwwwwwwwww @ wwwbwwwwwwwww
 
 
 @@                           @@
@@ -23,8 +23,8 @@ pppppcbppppppppp @ pppbppppppppp
                     bcb
              @@      b
 
-        pppppppppppppp
-        p            p
-        p   bb@bb    p
-        p            p
-        ppppb    ppppp
+        wwwwwwwwwwwwww
+        w            w
+        w   bb@bb    w
+        w            w
+        wwwwb    wwwww

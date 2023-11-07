@@ -41,7 +41,7 @@ class MyVector(pygame.Vector2):
 
 
 class Objeto(pygame.sprite.Sprite):
-    cor = (128, 128, 128)
+    color = (128, 128, 128)
 
     def __init__(self, dono, pos):
         super().__init__()
@@ -62,49 +62,49 @@ class Objeto(pygame.sprite.Sprite):
 
 
 class Catch(Objeto):
-    pontos = 0
+    points = 0
 
-    def pegou(self):
-        self.jogo.score += self.pontos
+    def catched(self):
+        self.jogo.score += self.points
         self.kill()
 
 
 class Treasure(Catch):
-    cor = (0, 0, 255)
-    pontos = 10
+    color = (0, 0, 255)
+    points = 10
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.jogo.treasures.add(self)
 
 
-class Parede(Objeto):
-    cor = (255, 255, 255)
+class Wall(Objeto):
+    color = (255, 255, 255)
 
 
 class Bomb(Catch):
-    cor = (255, 255, 0)
-    pontos = -10
+    color = (255, 255, 0)
+    points = -10
 
-    def pegou(self):
-        super().pegou()
+    def catched(self):
+        super().catched()
         self.jogo.p1.vidas -= 1
         if self.jogo.p1.vidas == 0:
             raise GameDefeatException
         self.jogo.bombs += 1
 
 class Candy(Catch):
-    cor = (148, 0, 211)
+    color = (148, 0, 211)
 
-    def pegou(self):
-        super().pegou()
+    def catched(self):
+        super().catched()
         if self.jogo.p1.vidas < 3:
             self.jogo.p1.vidas += 1
 
 class Personagem(Objeto):
     atraso = 3
     vidas = 3
-    cor = (255, 0, 0)
+    color = (255, 0, 0)
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -133,8 +133,8 @@ class Personagem(Objeto):
                 # Lugar ideal pra usar o
                 # comando match/case (py 3.10)
                 if isinstance(objeto_aqui, Catch):
-                    objeto_aqui.pegou()
-                elif isinstance(objeto_aqui, Parede):
+                    objeto_aqui.catched()
+                elif isinstance(objeto_aqui, Wall):
                     result = False
 
         return result
@@ -147,7 +147,7 @@ class Personagem(Objeto):
 tabela = {
     "@": Treasure,
     "*": Personagem,
-    "p": Parede,
+    "w": Wall,
     "b": Bomb,
     "c": Candy,
 }
@@ -252,8 +252,17 @@ class Game:
             if keys[pygame.K_p]:
                 print(dict(self.positions))
 
+<<<<<<< HEAD
             self.renderizar()
 
+=======
+            for objeto in self.objects:
+                pygame.draw.rect(
+                    self.screen,
+                    objeto.color,
+                    (*objeto.coord_tela, WIDTH, HEIGTH)
+                )
+>>>>>>> 15bb926 (Fixing bugs)
 
             self.show_score()
             self.show_lives()
