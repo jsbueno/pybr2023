@@ -252,17 +252,14 @@ class Game:
             if keys[pygame.K_p]:
                 print(dict(self.positions))
 
-<<<<<<< HEAD
             self.renderizar()
 
-=======
             for objeto in self.objects:
                 pygame.draw.rect(
                     self.screen,
                     objeto.color,
                     (*objeto.coord_tela, WIDTH, HEIGTH)
                 )
->>>>>>> 15bb926 (Fixing bugs)
 
             self.show_score()
             self.show_lives()
