@@ -273,7 +273,7 @@ class Game:
     def renderizar(self):
         for objeto in self.objects:
             pygame.draw.rect(
-                self.screen, objeto.cor, (*objeto.coord_tela, WIDTH, HEIGTH)
+                self.screen, objeto.color, (*objeto.coord_tela, WIDTH, HEIGTH)
             )
 
     def mostrar_pontuacao(self):
